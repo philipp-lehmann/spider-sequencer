@@ -63,6 +63,13 @@ function segments(b0, b1) {
 }
 export function segAt(beat) { return segments(beat, beat + 1e-6)[0]; }
 
+/* current position: beat on the timeline, the song block it falls in, and `at`, the beat inside that block's clips */
+export function viewPos() {
+  const beat = playing ? beatAt(ctx.currentTime) : pausedBeat;
+  const seg = songOn() ? segAt(beat) : null;
+  return { beat, seg, at: seg ? beat - seg.start : beat };
+}
+
 function tick() {
   const end = beatAt(ctx.currentTime + .12);
   if (songOn()) {

@@ -2,7 +2,7 @@
 import { R0 } from './constants.js';
 import { PRESETS } from './presets.js';
 import { state, selTrack, isDrum, midiName, noteMidi } from './state.js';
-import { snapT, quantU } from './geometry.js';
+import { snapA, toClipT, quantU } from './geometry.js';
 import { view } from './view.js';
 import { esc, mod1 } from './util.js';
 
@@ -25,7 +25,7 @@ export function renderReadout(pos) {
   else if (drag && drag.note) txt = noteDesc(tr, drag.note);
   else if (hover && hover.onNote) txt = noteDesc(tr, hover.onNote);
   else if (hover && hover.r > R0) {
-    const n = { t: snapT(tr, hover.t, hover.shift), p: state.mode === 'pitch' ? quantU(hover.u) : .5, v: state.mode === 'volume' ? quantU(hover.u) : .8 };
+    const n = { t: toClipT(tr, snapA(tr, hover.t, hover.shift), pos), p: state.mode === 'pitch' ? quantU(hover.u) : .5, v: state.mode === 'volume' ? quantU(hover.u) : .8 };
     txt = state.mode === 'pitch'
       ? `${posLabel(tr, n.t)} · ${isDrum(tr) ? 'tune' : midiName(noteMidi(tr, n))}`
       : `${posLabel(tr, n.t)} · vel ${Math.round(n.v * 100)}%`;

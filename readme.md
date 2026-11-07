@@ -11,6 +11,7 @@ https://claude.ai/artifact/AVptBwnK3h2BWW4gbVC5ye?sk=JFB35VVtYdgkEsVGm3SLWQ
 - Click to add, drag to move, double-click / right-click / drop on center to delete, Alt-drag to rotate.
 - Snap: 1/16, 1/8, 1/4 or Free. Shift ignores the grid for one note.
 - Global toggle: radius = pitch (snapped to scale) or volume. Each note stores both.
+- Circle toggle: one turn = one loop of the track (short loops spin faster), or always 4 bars (one shared playhead, short loops repeat around the circle).
 - Key: root note and scale (minor, major, dorian, phrygian, pentatonic, chromatic).
 - Tracks: name, colour, sound, loop length (1 to 8 bars), octave, volume, mute, solo, duplicate, delete.
 - Sounds: Sub Bass, Acid, Pluck, Pad, Lead, FM Bell, Tom, Kick, Snare, Hi-Hat, Clap. Shared delay send.
@@ -21,6 +22,8 @@ https://claude.ai/artifact/AVptBwnK3h2BWW4gbVC5ye?sk=JFB35VVtYdgkEsVGm3SLWQ
 - Help dialog, keyboard shortcuts, Feather icons, light and dark theme.
 
 ## Data model (export format, version 3)
+
+- top level: bpm, mode (`pitch` / `volume`), circle (`loop` / `bars`), snap, root, scale, sel, pat, playMode
 
 - `tracks[]`: id, name, preset, color, vol, base (MIDI octave), mute, solo, pat (current pattern)
 - `patterns[]`: id (A to H), bars (length in the song), clips { trackId: { bars, notes[] } }
@@ -39,11 +42,18 @@ npm run preview  # serve the build
 
 The build is a single HTML file, so it can still be shared or pasted as one artifact.
 
+## Feature flags
+
+New features sit behind a flag in `js/features.js`, one line each (`circleBars: true`). Set it to `false` to switch the feature off: code checks `feature('name')`, and markup tagged `data-feature="name"` is removed.
+
+To test without editing the file, use the URL: `?off=circleBars` or `?on=someFeature` (comma-separated for several).
+
 ## Structure
 
 - `index.html`: markup
 - `css/style.css`: Tailwind entry, design tokens (light / dark) and component styles
 - `js/main.js`: boot
+- `js/features.js`: feature flags
 - `js/constants.js`, `js/util.js`, `js/icons.js`: shared constants, helpers, Feather icons
 - `js/state.js`: app state and the helpers that read it; `js/storage.js`: JSON format and localStorage; `js/history.js`: undo
 - `js/audio.js`, `js/presets.js`: Web Audio graph and synth voices

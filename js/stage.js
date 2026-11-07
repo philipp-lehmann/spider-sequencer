@@ -2,8 +2,8 @@
 import { R0, R1 } from './constants.js';
 import { ctx } from './audio.js';
 import { state, selTrack, audible } from './state.js';
-import { playing, pausedBeat, beatAt, songOn, segAt, hits } from './transport.js';
-import { uOf, rOf, xy, snapT, quantU } from './geometry.js';
+import { playing, beatAt, songOn, segAt, viewPos, hits } from './transport.js';
+import { uOf, rOf, xy, snapA, quantU, angles, headAngle, barsMode } from './geometry.js';
 import { view, disp, hitAt, reduceMotion, layers } from './view.js';
 import { renderReadout } from './readout.js';
 import { renderGrid } from './grid.js';
@@ -11,58 +11,62 @@ import { renderTrackPats } from './tracks.js';
 import { renderPatterns, renderLane, placeSongHead } from './song.js';
 import { mod1 } from './util.js';
 
-const pos = n => xy(n.t, rOf(disp.get(n) ?? uOf(n)));
+const f1 = v => v.toFixed(1);
 
-function polyPath(tr) {
-  return [...tr.notes].sort((a, b) => a.t - b.t)
-    .map(n => { const [x, y] = pos(n); return x.toFixed(1) + ',' + y.toFixed(1); }).join(' ');
+/* every place a track's notes appear on the circle, sorted by angle: [{ n, a, x, y }] */
+function occurrences(tr, at) {
+  const out = [];
+  for (const n of tr.notes) {
+    const r = rOf(disp.get(n) ?? uOf(n));
+    for (const a of angles(tr, n, at)) { const [x, y] = xy(a, r); out.push({ n, a, x, y }); }
+  }
+  return out.sort((p, q) => p.a - q.a);
 }
+const points = occ => occ.map(o => f1(o.x) + ',' + f1(o.y)).join(' ');
 
-function pulse(n, now) {
+/* hit flash; with repeated copies only the copy the playhead just passed lights up */
+function pulse(o, head, now) {
   if (reduceMotion) return 0;
-  const t = hitAt.get(n); if (t == null) return 0;
+  const t = hitAt.get(o.n); if (t == null) return 0;
+  if (barsMode() && mod1(head - o.a) > .1) return 0;
   const d = (now - t) / 220; return d >= 1 ? 0 : 1 - d;
 }
 
 function draw() {
   const { hover, drag } = view;
-  const now = performance.now(), beat = playing ? beatAt(ctx.currentTime) : pausedBeat, sel = selTrack();
-  const seg = songOn() ? segAt(beat) : null, at = seg ? beat - seg.start : beat;
+  const now = performance.now(), sel = selTrack();
+  const { beat, seg, at } = viewPos();
   let h = '';
 
   /* other tracks: faint */
   for (const tr of state.tracks) {
     if (tr === sel) continue;
-    const op = audible(tr) ? 1 : .35;
-    if (tr.notes.length > 1) h += `<polygon points="${polyPath(tr)}" fill="${tr.color}" fill-opacity="${.10 * op}" stroke="${tr.color}" stroke-opacity="${.9 * op}" stroke-width="2" stroke-linejoin="round"/>`;
-    for (const n of tr.notes) {
-      const [x, y] = pos(n), s = 5 + pulse(n, now) * 7;
-      h += `<rect x="${(x - s).toFixed(1)}" y="${(y - s).toFixed(1)}" width="${2 * s}" height="${2 * s}" fill="${tr.color}" fill-opacity="${op}"/>`;
+    const op = audible(tr) ? 1 : .35, occ = occurrences(tr, at), head = headAngle(tr, at);
+    if (occ.length > 1) h += `<polygon points="${points(occ)}" fill="${tr.color}" fill-opacity="${.10 * op}" stroke="${tr.color}" stroke-opacity="${.9 * op}" stroke-width="2" stroke-linejoin="round"/>`;
+    for (const o of occ) {
+      const s = 5 + pulse(o, head, now) * 7;
+      h += `<rect x="${f1(o.x - s)}" y="${f1(o.y - s)}" width="${2 * s}" height="${2 * s}" fill="${tr.color}" fill-opacity="${op}"/>`;
     }
-    const L = tr.bars * 4, [px, py] = xy(mod1(at / L), R1 + 12), [qx, qy] = xy(mod1(at / L), R1);
-    h += `<line x1="${qx.toFixed(1)}" y1="${qy.toFixed(1)}" x2="${px.toFixed(1)}" y2="${py.toFixed(1)}" stroke="${tr.color}" stroke-width="6" stroke-opacity="${op}"/>`;
+    const [px, py] = xy(head, R1 + 12), [qx, qy] = xy(head, R1);
+    h += `<line x1="${f1(qx)}" y1="${f1(qy)}" x2="${f1(px)}" y2="${f1(py)}" stroke="${tr.color}" stroke-width="6" stroke-opacity="${op}"/>`;
   }
 
   /* selected track: editable */
   if (sel) {
-    const L = sel.bars * 4, pt = mod1(at / L);
-    const [a1, b1] = xy(pt, R0), [a2, b2] = xy(pt, R1 + 18);
-    h += `<line class="ph" x1="${a1.toFixed(1)}" y1="${b1.toFixed(1)}" x2="${a2.toFixed(1)}" y2="${b2.toFixed(1)}"/>`;
-    for (const n of sel.notes) {
-      const [x, y] = pos(n), [sx, sy] = xy(n.t, R0);
-      h += `<line class="stem" x1="${sx.toFixed(1)}" y1="${sy.toFixed(1)}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`;
-    }
+    const head = headAngle(sel, at), occ = occurrences(sel, at);
+    const [a1, b1] = xy(head, R0), [a2, b2] = xy(head, R1 + 18);
+    h += `<line class="ph" x1="${f1(a1)}" y1="${f1(b1)}" x2="${f1(a2)}" y2="${f1(b2)}"/>`;
+    for (const o of occ) { const [sx, sy] = xy(o.a, R0); h += `<line class="stem" x1="${f1(sx)}" y1="${f1(sy)}" x2="${f1(o.x)}" y2="${f1(o.y)}"/>`; }
     const op = audible(sel) ? 1 : .45;
-    if (sel.notes.length > 1) h += `<polygon class="poly" points="${polyPath(sel)}" fill="${sel.color}" fill-opacity="${.38 * op}"/>`;
+    if (occ.length > 1) h += `<polygon class="poly" points="${points(occ)}" fill="${sel.color}" fill-opacity="${.38 * op}"/>`;
     if (hover && !drag && !hover.onNote && hover.r > R0) {
-      const [x, y] = xy(snapT(sel, hover.t, hover.shift), rOf(quantU(hover.u)));
+      const [x, y] = xy(snapA(sel, hover.t, hover.shift), rOf(quantU(hover.u)));
       h += `<rect class="prev" x="${x - 10}" y="${y - 10}" width="20" height="20"/>`;
     }
-    for (const n of sel.notes) {
-      const [x, y] = pos(n);
-      const big = (drag && drag.note === n) || (hover && hover.onNote === n);
-      const s = (big ? 12 : 9) + pulse(n, now) * 8;
-      h += `<rect class="node" x="${(x - s).toFixed(1)}" y="${(y - s).toFixed(1)}" width="${2 * s}" height="${2 * s}" fill="${sel.color}" fill-opacity="${op}"/>`;
+    for (const o of occ) {
+      const big = (drag && drag.note === o.n) || (hover && hover.onNote === o.n);
+      const s = (big ? 12 : 9) + pulse(o, head, now) * 8;
+      h += `<rect class="node" x="${f1(o.x - s)}" y="${f1(o.y - s)}" width="${2 * s}" height="${2 * s}" fill="${sel.color}" fill-opacity="${op}"/>`;
     }
   } else {
     h += `<text class="emptytxt" y="${-R0 - 40}" text-anchor="middle">Add a track to start</text>`;

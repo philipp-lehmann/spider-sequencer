@@ -9,7 +9,7 @@ const cleanNote = n => ({ t: +n.t.toFixed(5), p: +n.p.toFixed(4), v: +n.v.toFixe
 
 export function serialize() {
   const ids = new Set(state.tracks.map(t => t.id));
-  return JSON.stringify({ version: 3, bpm: state.bpm, mode: state.mode, snap: state.snap, root: state.root, scale: state.scale, sel: state.sel,
+  return JSON.stringify({ version: 3, bpm: state.bpm, mode: state.mode, circle: state.circle, snap: state.snap, root: state.root, scale: state.scale, sel: state.sel,
     pat: state.pat, playMode: state.playMode, song: state.song,
     tracks: state.tracks.map(t => ({ id: t.id, name: t.name, preset: t.preset, color: t.color, vol: t.vol, base: t.base, mute: t.mute, solo: t.solo, pat: t.pat })),
     patterns: state.patterns.map(p => ({ id: p.id, bars: p.bars,
@@ -43,7 +43,7 @@ export function deserialize(json) {
   tracks.forEach((t, i) => { if (!patterns.some(p => p.clips[t.id])) patterns[0].clips[t.id] = { bars: tBars[i], notes: [] }; });
   tracks.forEach(attachNotes);
   const song = (Array.isArray(o.song) ? o.song : []).filter(s => PAT_IDS.includes(s.pat)).map(s => ({ pat: s.pat, reps: clamp(Math.round(+s.reps || 1), 1, 16) }));
-  return { bpm: clamp(+o.bpm || 120, 40, 240), mode: o.mode === 'volume' ? 'volume' : 'pitch', snap: [16, 8, 4, 0].includes(o.snap) ? o.snap : 16,
+  return { bpm: clamp(+o.bpm || 120, 40, 240), mode: o.mode === 'volume' ? 'volume' : 'pitch', circle: o.circle === 'bars' ? 'bars' : 'loop', snap: [16, 8, 4, 0].includes(o.snap) ? o.snap : 16,
     root: clamp(+o.root || 0, 0, 11), scale: SCALES[o.scale] ? o.scale : 'minor', tracks, sel: tracks.some(t => t.id === o.sel) ? o.sel : tracks[0]?.id ?? null,
     patterns, pat: gpat, song, playMode: o.playMode === 'song' ? 'song' : 'pattern' };
 }

@@ -2,8 +2,8 @@
 import { R0, R1 } from './constants.js';
 import { ensureAudio } from './audio.js';
 import { state, selTrack, isDrum, noteMidi } from './state.js';
-import { toggle, preview } from './transport.js';
-import { uOf, rOf, xy, toSvg, polar, gridN, snapT, setU } from './geometry.js';
+import { toggle, preview, viewPos } from './transport.js';
+import { uOf, rOf, xy, toSvg, polar, snapA, toClipT, angles, circleBars, setU } from './geometry.js';
 import { view, disp, invalidate, svg } from './view.js';
 import { serialize, save } from './storage.js';
 import { pushHistory } from './history.js';
@@ -13,14 +13,22 @@ import { mod1 } from './util.js';
 const HIT_RADIUS = 24, DOUBLE_TAP_MS = 330;
 let lastTap = {}, pendingSnap = null;
 
+/* closest note to an SVG point, checking every copy of it on the circle */
 export function nearest(tr, pt, max) {
+  const { at } = viewPos();
   let best = null, bd = max;
   for (const n of tr.notes) {
-    const [x, y] = xy(n.t, rOf(uOf(n))); const d = Math.hypot(x - pt.x, y - pt.y);
-    if (d < bd) { bd = d; best = n; }
+    const r = rOf(uOf(n));
+    for (const a of angles(tr, n, at)) {
+      const [x, y] = xy(a, r); const d = Math.hypot(x - pt.x, y - pt.y);
+      if (d < bd) { bd = d; best = n; }
+    }
   }
   return best;
 }
+
+/* circle angle under the pointer -> snapped clip position */
+const clipT = (tr, a, free) => toClipT(tr, snapA(tr, a, free), viewPos().at);
 
 export function removeNote(tr, n) {
   const i = tr.notes.indexOf(n); if (i >= 0) tr.notes.splice(i, 1);
@@ -45,7 +53,7 @@ function onDown(e) {
     view.drag = { type: 'node', note: hit, tr, lastMidi: null };
   } else {
     if (p.r > R1 + 30) { view.drag = null; return; }
-    const n = { t: snapT(tr, p.t, e.shiftKey || state.snap === 0), p: .5, v: .8 }; setU(n, p.u); disp.set(n, uOf(n));
+    const n = { t: clipT(tr, p.t, e.shiftKey || state.snap === 0), p: .5, v: .8 }; setU(n, p.u); disp.set(n, uOf(n));
     tr.notes.push(n); updateCount(); preview(tr, n);
     lastTap = { n, time: now, created: true };
     view.drag = { type: 'node', note: n, tr, lastMidi: noteMidi(tr, n), created: true };
@@ -59,12 +67,13 @@ function onMove(e) {
   svg.style.cursor = p.r < R0 - 4 ? 'pointer' : (view.hover.onNote ? 'grab' : (drag ? 'grabbing' : 'crosshair'));
   if (drag && drag.type === 'node') {
     const n = drag.note; drag.overHub = p.r < R0;
-    n.t = snapT(drag.tr, p.t, e.shiftKey); setU(n, p.u); disp.set(n, uOf(n));
+    n.t = clipT(drag.tr, p.t, e.shiftKey); setU(n, p.u); disp.set(n, uOf(n));
     const m = isDrum(drag.tr) ? Math.round(n.p * 24) : noteMidi(drag.tr, n);
     if (state.mode === 'pitch' && m !== drag.lastMidi) { drag.lastMidi = m; if (!drag.overHub) preview(drag.tr, n); }
   } else if (drag && drag.type === 'rot') {
-    let dt = mod1(p.t - drag.t0 + .5) - .5;
-    if (!e.shiftKey && state.snap) { const g = gridN(drag.tr); dt = Math.round(dt * g) / g; }
+    let dt = mod1(p.t - drag.t0 + .5) - .5; /* in circle turns */
+    if (!e.shiftKey && state.snap) { const g = circleBars(drag.tr) * state.snap; dt = Math.round(dt * g) / g; }
+    dt *= circleBars(drag.tr) / drag.tr.bars; /* -> clip turns */
     drag.tr.notes.forEach((n, i) => n.t = mod1(drag.orig[i] + dt));
   }
   invalidate();

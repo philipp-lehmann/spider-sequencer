@@ -4,6 +4,7 @@ import { pushHistory, applyState } from './history.js';
 import { setBpm } from './transport.js';
 import { toast } from './toast.js';
 import { ic } from './icons.js';
+import { pruneFeatures } from './features.js';
 
 function modal(title, text, editable) {
   const sc = document.createElement('div'); sc.className = 'scrim';
@@ -39,7 +40,8 @@ const HELP = `
 <h4>Timing</h4><dl>
 <dt>Snap</dt><dd>1/16, 1/8 and 1/4 lock notes to the grid. Free places them exactly where you drop them.</dd>
 <dt>Shift</dt><dd>Hold while placing or dragging to ignore the grid for that note.</dd>
-<dt>Loop length</dt><dd>Each track's pattern has its own length (1–8 bars). Different lengths give you polyrhythms.</dd></dl>
+<dt>Loop length</dt><dd>Each track's pattern has its own length (1–8 bars). Different lengths give you polyrhythms.</dd>
+<div data-feature="circleBars"><dt>Circle</dt><dd>Loop: one turn is one loop of the track, so short loops go round faster. 4 bars: one turn is always 4 bars, all tracks share one playhead and short loops repeat (a 1-bar loop shows four times). Editing any copy changes all of them.</dd></div></dl>
 <h4>Patterns</h4><dl>
 <dt>Per track</dt><dd>Each track has eight patterns, A–H, in the bottom row of its card. A line under a letter means that pattern has notes.</dd>
 <dt>All tracks</dt><dd>The letters under the circle switch every track to the same pattern at once. Duplicate and Clear there act on that pattern for all tracks.</dd>
@@ -57,6 +59,7 @@ const HELP = `
 function openHelp() {
   const sc = document.createElement('div'); sc.className = 'scrim';
   sc.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="Help"><h3>How it works</h3><div class="help">${HELP}</div><div class="acts"><span class="msg"></span><button data-a="x">${ic('x')}Close</button></div></div>`;
+  pruneFeatures(sc);
   document.body.appendChild(sc);
   sc.querySelector('[data-a="x"]').focus();
   const close = () => { sc.remove(); document.getElementById('helpBtn').focus(); };

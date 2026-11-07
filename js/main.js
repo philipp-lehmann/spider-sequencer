@@ -3,6 +3,7 @@ import { buildSet } from './sets.js';
 import { serialize, load } from './storage.js';
 import { play, pause } from './transport.js';
 import { hydrateIcons } from './icons.js';
+import { pruneFeatures } from './features.js';
 import { initHeader, syncHeader, syncPlayBtn } from './header.js';
 import { initTracks, renderList } from './tracks.js';
 import { initTools } from './tools.js';
@@ -13,6 +14,7 @@ import { initKeyboard } from './keyboard.js';
 import { renderGrid } from './grid.js';
 import { startLoop } from './stage.js';
 
+pruneFeatures();
 hydrateIcons();
 initHeader(); initTracks(); initTools(); initEditor(); initSong(); initDialogs(); initKeyboard();
 
