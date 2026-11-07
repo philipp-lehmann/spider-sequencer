@@ -1,9 +1,9 @@
 # Spider Sequencer
 
-Browser-based circular step sequencer. Each track is a spider chart: the angle is time, the distance from the center is pitch or volume. Single file (`index.html`), plain JS, Web Audio, SVG. No build step, no dependencies.
+Browser-based circular step sequencer. Each track is a spider chart: the angle is time, the distance from the center is pitch or volume. Plain JS (ES modules), Web Audio, SVG, Tailwind CSS. Vite for dev and build; no runtime dependencies.
 
-Live version: Claude artifact "Spider Sequencer" (shared via link).
-Visual reference: `kiki-reference.png` in the project's Dropbox folder (`01 Material`). Boxed Swiss look, 2px outlines, flat primaries, mono type.
+Live version of initial idea: Claude artifact "Spider Sequencer".
+https://claude.ai/artifact/AVptBwnK3h2BWW4gbVC5ye?sk=JFB35VVtYdgkEsVGm3SLWQ
 
 ## Current features
 
@@ -28,9 +28,30 @@ Visual reference: `kiki-reference.png` in the project's Dropbox folder (`01 Mate
 - `song[]`: { pat, reps }
 - Older v1 / v2 files still load.
 
+## Development
+
+```sh
+npm install
+npm start        # dev server on localhost, opens the browser
+npm run build    # self-contained dist/index.html (JS and CSS inlined)
+npm run preview  # serve the build
+```
+
+The build is a single HTML file, so it can still be shared or pasted as one artifact.
+
 ## Structure
 
-- `index.html`: the whole app, opens directly in a browser
+- `index.html`: markup
+- `css/style.css`: Tailwind entry, design tokens (light / dark) and component styles
+- `js/main.js`: boot
+- `js/constants.js`, `js/util.js`, `js/icons.js`: shared constants, helpers, Feather icons
+- `js/state.js`: app state and the helpers that read it; `js/storage.js`: JSON format and localStorage; `js/history.js`: undo
+- `js/audio.js`, `js/presets.js`: Web Audio graph and synth voices
+- `js/transport.js`: play / pause, tempo, look-ahead scheduler, song timeline
+- `js/view.js`, `js/geometry.js`, `js/grid.js`, `js/stage.js`, `js/readout.js`: the circle (shared view state, polar maths, background, per-frame drawing, status line)
+- `js/editor.js`, `js/tools.js`: pointer editing and the buttons under the circle
+- `js/tracks.js`, `js/header.js`, `js/song.js`, `js/dialogs.js`, `js/toast.js`, `js/keyboard.js`: the rest of the UI
+- `js/sets.js`: starter sets
 - `docs/ideas.md`: ideas backlog
 
 Project material and transfers live in Dropbox, this folder is code only.

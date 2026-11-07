@@ -1,0 +1,19 @@
+{
+  "name": "spider-seq",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Browser-based circular step sequencer. Each track is a spider chart: angle is time, radius is pitch or volume.",
+  "type": "module",
+  "scripts": {
+    "start": "vite --open",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.5",
+    "tailwindcss": "^4.3.5",
+    "vite": "^8.3.6",
+    "vite-plugin-singlefile": "^2.3.4"
+  }
+}
