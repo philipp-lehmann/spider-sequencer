@@ -3,7 +3,7 @@
 import { SCALES, NAMES, PAT_IDS, PALETTE } from './constants.js';
 import { PRESETS } from './presets.js';
 
-export let state = { bpm: 120, mode: 'pitch', circle: 'loop', snap: 16, root: 9, scale: 'minor', tracks: [], sel: null, patterns: [], pat: 'A', song: [], playMode: 'pattern' };
+export let state = { bpm: 120, mode: 'pitch', snap: 16, root: 9, scale: 'minor', tracks: [], sel: null, patterns: [], pat: 'A', song: [], playMode: 'pattern' };
 export function setState(s) { state = s; }
 
 /* number of pitch rings: two octaves of the scale plus the top root */

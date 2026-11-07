@@ -1,6 +1,6 @@
 /* Polar geometry: the angle a (0..1) is time, u (0..1) the distance from the hub / pitch or volume.
 
-   Two circle modes (state.circle):
+   Two circle modes (prefs.circle, set in Settings):
    - 'loop': the circle is one loop of the track, so a 1-bar and a 4-bar track run at different speeds.
      Circle angle and clip position (note.t) are the same thing.
    - 'bars': the circle is always CIRCLE_BARS bars, so every track runs at the same speed and shorter
@@ -11,6 +11,7 @@ import { state, levels } from './state.js';
 import { clamp, mod1 } from './util.js';
 import { svg } from './view.js';
 import { feature } from './features.js';
+import { prefs } from './prefs.js';
 
 export const CIRCLE_BARS = 4;
 const WINDOW = CIRCLE_BARS * 4; /* beats */
@@ -29,7 +30,7 @@ export function polar(pt) {
 }
 
 /* ---------- circle mode ---------- */
-export const barsMode = () => feature('circleBars') && state.circle === 'bars';
+export const barsMode = () => feature('circleBars') && prefs.circle === 'bars';
 /* bars shown around the full circle for this track */
 export const circleBars = tr => barsMode() ? CIRCLE_BARS : tr.bars;
 const winStart = at => barsMode() ? Math.floor(at / WINDOW) * WINDOW : 0;

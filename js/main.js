@@ -10,13 +10,14 @@ import { initTools } from './tools.js';
 import { initEditor } from './editor.js';
 import { initSong, renderPatterns, renderLane } from './song.js';
 import { initDialogs } from './dialogs.js';
+import { initSettings } from './settings.js';
 import { initKeyboard } from './keyboard.js';
 import { renderGrid } from './grid.js';
 import { startLoop } from './stage.js';
 
 pruneFeatures();
 hydrateIcons();
-initHeader(); initTracks(); initTools(); initEditor(); initSong(); initDialogs(); initKeyboard();
+initHeader(); initTracks(); initTools(); initEditor(); initSong(); initDialogs(); initSettings(); initKeyboard();
 
 setState(load() || buildSet('techno'));
 syncHeader(); syncPlayBtn(); renderList(); renderGrid(); renderPatterns(); renderLane();

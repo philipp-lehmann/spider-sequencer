@@ -49,7 +49,7 @@
   .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
   /* header */
-  .bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 20px;padding-block:16px 14px}
+  .bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 14px;padding-block:16px 14px}
   .brand{display:flex;align-items:flex-end;gap:10px;margin-right:8px}
   .brand b{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;border:var(--b) solid var(--ink);padding:6px 10px 5px;letter-spacing:-.02em}
   .brand span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding-bottom:4px}

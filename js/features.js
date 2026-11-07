@@ -7,8 +7,10 @@
 
    Testing without editing this file: add ?on=a,b or ?off=a,b to the URL. */
 export const FEATURES = {
-  /* Circle = Loop / 4 bars toggle in the header */
+  /* Settings > Circle: Loop / 4 bars */
   circleBars: true,
+  /* Settings > Preview sound on / off */
+  previewSetting: true,
 };
 
 const params = new URLSearchParams(location.search);

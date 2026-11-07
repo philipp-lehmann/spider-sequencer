@@ -11,7 +11,9 @@ https://claude.ai/artifact/AVptBwnK3h2BWW4gbVC5ye?sk=JFB35VVtYdgkEsVGm3SLWQ
 - Click to add, drag to move, double-click / right-click / drop on center to delete, Alt-drag to rotate.
 - Snap: 1/16, 1/8, 1/4 or Free. Shift ignores the grid for one note.
 - Global toggle: radius = pitch (snapped to scale) or volume. Each note stores both.
-- Circle toggle: one turn = one loop of the track (short loops spin faster), or always 4 bars (one shared playhead, short loops repeat around the circle).
+- Settings dialog (saved per browser, not in the project):
+  - Circle: one turn = one loop of the track (short loops spin faster), or always 4 bars (one shared playhead, short loops repeat around the circle).
+  - Preview sound on / off while adding or dragging notes.
 - Key: root note and scale (minor, major, dorian, phrygian, pentatonic, chromatic).
 - Tracks: name, colour, sound, loop length (1 to 8 bars), octave, volume, mute, solo, duplicate, delete.
 - Sounds: Sub Bass, Acid, Pluck, Pad, Lead, FM Bell, Tom, Kick, Snare, Hi-Hat, Clap. Shared delay send.
@@ -23,7 +25,7 @@ https://claude.ai/artifact/AVptBwnK3h2BWW4gbVC5ye?sk=JFB35VVtYdgkEsVGm3SLWQ
 
 ## Data model (export format, version 3)
 
-- top level: bpm, mode (`pitch` / `volume`), circle (`loop` / `bars`), snap, root, scale, sel, pat, playMode
+- top level: bpm, mode (`pitch` / `volume`), snap, root, scale, sel, pat, playMode
 
 - `tracks[]`: id, name, preset, color, vol, base (MIDI octave), mute, solo, pat (current pattern)
 - `patterns[]`: id (A to H), bars (length in the song), clips { trackId: { bars, notes[] } }
@@ -54,6 +56,7 @@ To test without editing the file, use the URL: `?off=circleBars` or `?on=someFea
 - `css/style.css`: Tailwind entry, design tokens (light / dark) and component styles
 - `js/main.js`: boot
 - `js/features.js`: feature flags
+- `js/prefs.js`, `js/settings.js`: app settings (localStorage) and the settings dialog
 - `js/constants.js`, `js/util.js`, `js/icons.js`: shared constants, helpers, Feather icons
 - `js/state.js`: app state and the helpers that read it; `js/storage.js`: JSON format and localStorage; `js/history.js`: undo
 - `js/audio.js`, `js/presets.js`: Web Audio graph and synth voices

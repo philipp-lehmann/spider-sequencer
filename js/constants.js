@@ -15,7 +15,7 @@ export const SCALES = {
 };
 export const SNAPS = [[16, '1/16'], [8, '1/8'], [4, '1/4'], [0, 'Free']];
 export const MODES = [['pitch', 'Pitch'], ['volume', 'Volume']];
-/* what one turn of the circle shows: one loop of the track, or a fixed 4 bars */
+/* Settings > Circle: what one turn shows, one loop of the track or a fixed 4 bars */
 export const CIRCLES = [['loop', 'Loop'], ['bars', '4 bars']];
 
 export const PAT_IDS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];

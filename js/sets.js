@@ -68,6 +68,6 @@ export function buildSet(key) {
   }
   s.tracks.forEach(([, , bars], i) => { if (!patterns[0].clips[tracks[i].id]) patterns[0].clips[tracks[i].id] = { bars, notes: [] }; });
   tracks.forEach(attachNotes);
-  return { bpm: s.bpm, mode: state.mode, circle: state.circle, snap: state.snap, root: s.root, scale: s.scale, tracks, sel: tracks[0].id,
+  return { bpm: s.bpm, mode: state.mode, snap: state.snap, root: s.root, scale: s.scale, tracks, sel: tracks[0].id,
     patterns, pat: 'A', song: s.song.map(([pat, reps]) => ({ pat, reps })), playMode: 'pattern' };
 }

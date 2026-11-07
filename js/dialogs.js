@@ -34,6 +34,7 @@ const HELP = `
 <h4>Editing notes</h4><dl>
 <dt>Add</dt><dd>Click an empty spot inside the circle. Keep holding to drag it into place.</dd>
 <dt>Move</dt><dd>Drag a note. Around the circle is time, distance from the center is pitch or volume.</dd>
+<div data-feature="previewSetting"><dt>Preview</dt><dd>Notes sound while you add or drag them. Turn this off in Settings.</dd></div>
 <dt>Delete</dt><dd>Double-click or right-click a note, drop it on the center, or hover it and press <kbd>Delete</kbd>.</dd>
 <dt>Rotate</dt><dd>Hold <kbd>Alt</kbd>/<kbd>⌥</kbd> and drag to turn the whole track, or use the rotate buttons under the circle.</dd>
 <dt>Pitch / Volume</dt><dd>Pitch snaps to the scale set under Key. On drum sounds, pitch tunes the drum. Each note keeps both values, so switching never loses anything.</dd></dl>
@@ -41,7 +42,7 @@ const HELP = `
 <dt>Snap</dt><dd>1/16, 1/8 and 1/4 lock notes to the grid. Free places them exactly where you drop them.</dd>
 <dt>Shift</dt><dd>Hold while placing or dragging to ignore the grid for that note.</dd>
 <dt>Loop length</dt><dd>Each track's pattern has its own length (1–8 bars). Different lengths give you polyrhythms.</dd>
-<div data-feature="circleBars"><dt>Circle</dt><dd>Loop: one turn is one loop of the track, so short loops go round faster. 4 bars: one turn is always 4 bars, all tracks share one playhead and short loops repeat (a 1-bar loop shows four times). Editing any copy changes all of them.</dd></div></dl>
+<div data-feature="circleBars"><dt>Circle</dt><dd>In Settings. Loop: one turn is one loop of the track, so short loops go round faster. 4 bars: one turn is always 4 bars, all tracks share one playhead and short loops repeat (a 1-bar loop shows four times). Editing any copy changes all of them.</dd></div></dl>
 <h4>Patterns</h4><dl>
 <dt>Per track</dt><dd>Each track has eight patterns, A–H, in the bottom row of its card. A line under a letter means that pattern has notes.</dd>
 <dt>All tracks</dt><dd>The letters under the circle switch every track to the same pattern at once. Duplicate and Clear there act on that pattern for all tracks.</dd>

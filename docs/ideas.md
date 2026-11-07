@@ -13,7 +13,7 @@ Collected 2026-10-28 after the first playable version.
 ## Playing
 
 - [ ] Chords mode (one node triggers a chord instead of a single note)
-- [ ] Option to disable the preview sound when adding or dragging notes
+- [x] Option to disable the preview sound when adding or dragging notes
 
 ## Generating
 

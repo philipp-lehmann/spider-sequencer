@@ -9,8 +9,12 @@ import { serialize, save } from './storage.js';
 import { pushHistory } from './history.js';
 import { updateCount } from './tracks.js';
 import { mod1 } from './util.js';
+import { feature } from './features.js';
+import { prefs } from './prefs.js';
 
 const HIT_RADIUS = 24, DOUBLE_TAP_MS = 330;
+/* Settings > Preview sound */
+const previewOn = () => !feature('previewSetting') || prefs.preview;
 let lastTap = {}, pendingSnap = null;
 
 /* closest note to an SVG point, checking every copy of it on the circle */
@@ -54,7 +58,7 @@ function onDown(e) {
   } else {
     if (p.r > R1 + 30) { view.drag = null; return; }
     const n = { t: clipT(tr, p.t, e.shiftKey || state.snap === 0), p: .5, v: .8 }; setU(n, p.u); disp.set(n, uOf(n));
-    tr.notes.push(n); updateCount(); preview(tr, n);
+    tr.notes.push(n); updateCount(); if (previewOn()) preview(tr, n);
     lastTap = { n, time: now, created: true };
     view.drag = { type: 'node', note: n, tr, lastMidi: noteMidi(tr, n), created: true };
   }
@@ -69,7 +73,7 @@ function onMove(e) {
     const n = drag.note; drag.overHub = p.r < R0;
     n.t = clipT(drag.tr, p.t, e.shiftKey); setU(n, p.u); disp.set(n, uOf(n));
     const m = isDrum(drag.tr) ? Math.round(n.p * 24) : noteMidi(drag.tr, n);
-    if (state.mode === 'pitch' && m !== drag.lastMidi) { drag.lastMidi = m; if (!drag.overHub) preview(drag.tr, n); }
+    if (state.mode === 'pitch' && m !== drag.lastMidi) { drag.lastMidi = m; if (!drag.overHub && previewOn()) preview(drag.tr, n); }
   } else if (drag && drag.type === 'rot') {
     let dt = mod1(p.t - drag.t0 + .5) - .5; /* in circle turns */
     if (!e.shiftKey && state.snap) { const g = circleBars(drag.tr) * state.snap; dt = Math.round(dt * g) / g; }

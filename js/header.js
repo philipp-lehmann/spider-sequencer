@@ -1,5 +1,5 @@
 /* Header strip: transport, play mode, BPM, radius mode, snap, key; plus the starter set loader */
-import { NAMES, SCALES, SNAPS, MODES, CIRCLES } from './constants.js';
+import { NAMES, SCALES, SNAPS, MODES } from './constants.js';
 import { ctx, setDelayTime } from './audio.js';
 import { state } from './state.js';
 import { playing, toggle, rewind, setBpm, setPausedBeat } from './transport.js';
@@ -11,12 +11,11 @@ import { renderPatterns, renderLane } from './song.js';
 import { SETS, buildSet } from './sets.js';
 import { toast } from './toast.js';
 import { ic } from './icons.js';
-import { feature } from './features.js';
 
 const $ = id => document.getElementById(id);
 
 /* segmented button group */
-function seg(el, items, cur, on) {
+export function seg(el, items, cur, on) {
   el.innerHTML = items.map(([v, l]) => `<button data-v="${v}" aria-pressed="${String(v) === String(cur)}">${l}</button>`).join('');
   el.onclick = e => { const b = e.target.closest('button'); if (b) on(b.dataset.v); };
 }
@@ -24,7 +23,6 @@ function seg(el, items, cur, on) {
 export function syncHeader() {
   $('bpm').value = state.bpm;
   seg($('modeSeg'), MODES, state.mode, v => { state.mode = v; syncHeader(); renderGrid(); invalidate(); save(); });
-  if (feature('circleBars')) seg($('circleSeg'), CIRCLES, state.circle, v => { state.circle = v; syncHeader(); renderGrid(); invalidate(); save(); });
   seg($('snapSeg'), SNAPS, state.snap, v => { state.snap = +v; syncHeader(); renderGrid(); invalidate(); save(); });
   seg($('playSeg'), [['pattern', 'Pattern'], ['song', 'Song']], state.playMode, v => {
     if (v === 'song' && !state.song.length) toast('The song is empty. Add a block with + in the Song row.');
@@ -56,7 +54,7 @@ export function initHeader() {
   $('loadSet').onclick = () => {
     pushHistory();
     const k = $('setSel').value, s = buildSet(k);
-    s.mode = state.mode; s.circle = state.circle; s.snap = state.snap;
+    s.mode = state.mode; s.snap = state.snap;
     applyState(s); setBpm(s.bpm);
     toast(`Loaded ${SETS[k].l}`, true);
   };
